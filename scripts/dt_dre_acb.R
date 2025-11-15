@@ -36,27 +36,29 @@ tabla <- df %>%
 
 
   reactable(
-   df %>% 
-     head(10) %>% 
-     select(-logo_cuadrado, -equipo),
-    columns = list(
-      num_jornada = colDef("Jor"),
-      license_license_str15 = colDef(name = "Jug"),
-      points     = colDef(name = "Pts"),
-      asis     = colDef(name = "Ast"),
-      total_rebound     = colDef(name = "Reb"),
-      val     = colDef(name = "Val"),
-      dre = colDef("Dre")
-    ),
+   df %>%
+     select( -equipo),
+   columns = list(
+     num_jornada = colDef(name = "Jor",    minWidth = 50),
+     license_license_str15 = colDef(name = "Jug", minWidth = 180),
+     points     = colDef(name = "Pts", minWidth = 50),
+     asis       = colDef(name = "Ast", minWidth = 50),
+     total_rebound = colDef(name = "Reb", minWidth = 50),
+     val        = colDef(name = "Val", minWidth = 50),
+     dre        = colDef(name = "Dre", minWidth = 50),
+     rival = colDef(name = "Rival", minWidth = 180)
+   ),
     pagination = TRUE,
     filterable = TRUE,
     highlight = TRUE,
    theme = reactableTheme(
      header = list(
-       borderBottom = "3px solid black"   # << línea debajo de los nombres del header
+       borderBottom = "3px solid black",
+       textAlign = "center"          # centra los nombres del header
      ),
      style = list(
-       fontFamily = "Oswald"   # aplicar la fuente
+       fontFamily = "Oswald",
+       textAlign = "center"           # centra todos los valores de las celdas
      )
    )
   )

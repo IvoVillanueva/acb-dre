@@ -3,7 +3,6 @@ library(tidyverse)
 library(janitor)
 library(gt)
 library(gtExtras)
-library(gtUtils)
 
 # datos
 racha <- read_csv(

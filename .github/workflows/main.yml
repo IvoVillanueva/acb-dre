@@ -42,7 +42,8 @@ jobs:
       - name: Install CRAN packages
         uses: r-lib/actions/setup-r-dependencies@v2
         with: 
-          packages: tidyverse, janitor, gt, gtExtras
+          packages: tidyverse, janitor, gt, gtExtras, gtUtils
+          extra-packages: andreweatherman/gtUtils                            
           
       - name: Run R script
         run: Rscript scripts/dre_top5.R
@@ -53,7 +54,7 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add png/*.png
-          git diff --cached --quiet || git commit -m "Auto-update: Boxscore ACB 2025-26"
+          git diff --cached --quiet || git commit -m "Auto-update: 5 Mejores y 3 Peores"
         shell: bash
 
       - name: Push changes

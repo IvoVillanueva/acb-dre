@@ -2,6 +2,7 @@
 library(tidyverse)
 library(janitor)
 library(reactable)
+library(htmltools)
 
 # datos
 racha <- read_csv(
@@ -34,3 +35,15 @@ combine_word <- function(license_license_str15, rival, logo_cuadrado) {
     </div>"
   )
 }
+
+
+totales_equipo <-jornada_dre %>% 
+  filter(num_jornada == max(num_jornada) & !is.na(license_license_str15)) %>%
+  group_by(id_match, abb) %>% 
+  summarise(
+    team_fga     = sum(x2pt_tried + x3pt_tried, na.rm = TRUE),
+    team_fta     = sum(x1pt_tried, na.rm = TRUE),
+    team_tov     = sum(turnovers, na.rm = TRUE),
+    team_minutes = sum(time_played, na.rm = TRUE),
+    .groups = "drop"
+  )

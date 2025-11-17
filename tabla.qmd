@@ -1,0 +1,63 @@
+---
+title: "Untitled"
+format: html
+---
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+source("scripts/acb_dre.R")
+
+reactable(
+  df %>% 
+    select(-equipo, -abb, -rival, -matches, -logo_cuadrado),
+  columns = list(
+    license_license_str15 = colDef(
+      name = "",
+      html = TRUE,
+      cell = function(value, index) {
+        htmltools::HTML(
+          combine_word(
+            license_license_str15 = value,
+            rival = df$rival[index],
+            logo_cuadrado = df$logo_cuadrado[index]
+          )
+        )
+      }
+    ),
+    time_played   = colDef(name = "Min",  align = "right", vAlign = "center"),
+    ts_pct        = colDef(name = "Ts%",  align = "right", vAlign = "center"),
+    usg_pct       = colDef(name = "Usg%", align = "right", vAlign = "center"),
+    points        = colDef(name = "Pts",  vAlign = "center"),
+    asis          = colDef(name = "Ast",  vAlign = "center"),
+    total_rebound = colDef(name = "Reb",  vAlign = "center"),
+    turnovers     = colDef(name = "Tot",  vAlign = "center"),
+    steals        = colDef(name = "Stl",  vAlign = "center"),
+    blocks        = colDef(name = "Blk",  vAlign = "center"),
+    x2pm_a        = colDef(name = "2pt",  align = "right", vAlign = "center"),
+    x3pm_a        = colDef(name = "3pt",  align = "right", vAlign = "center"),
+    x1pm_a        = colDef(name = "1pt",  align = "right", vAlign = "center"),
+    val           = colDef(name = "Val",  align = "center", vAlign = "center"),
+    dre           = colDef(name = "Dre",  align = "center", vAlign = "center"),
+    differential  = colDef(name = "+/-",  vAlign = "center")
+  ),
+  fullWidth = TRUE,      # usa todo el ancho disponible del chunk
+  width     = "100%",    # asegura 100% del contenedor
+  defaultPageSize = 25,
+  theme = reactableTheme(
+    header = list(
+      borderBottom = "3px solid black",
+      textAlign = "center",
+      fontSize = "11px"
+    ),
+    style = list(
+      fontFamily = "Oswald",
+      fontSize   = "11px"  # aquí haces el “zoom”: baja a 10px, 9px si quieres más info a la vista
+    )
+  )
+)
+```
+
+```
+

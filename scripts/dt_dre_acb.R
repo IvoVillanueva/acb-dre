@@ -2,6 +2,7 @@ source("scripts/acb_dre.R")
 
 
 tabla <- df %>%
+  mutate(dre = round(dre, 1)) %>% 
   select(-equipo, -abb, -rival, -matches, -logo_cuadrado) %>% 
 reactable(
   columns = list(
@@ -48,10 +49,4 @@ reactable(
       fontFamily = "Oswald"
     )
   )
-)
-
-
-div(
-    h2(class = "title", "Los Mejores De La Jornada"),
-    tabla
 )

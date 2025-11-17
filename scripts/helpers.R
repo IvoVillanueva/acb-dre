@@ -4,7 +4,8 @@ library(janitor)
 library(gt)
 library(gtExtras)
 library(gtUtils)
-
+library(reactable)
+library(htmltools)
 # datos
 racha <- read_csv(
   "https://raw.githubusercontent.com/IvoVillanueva/pbp-acb-2025-26/refs/heads/main/data/last_result.csv",
@@ -23,15 +24,15 @@ clubs <- read.csv("https://raw.githubusercontent.com/IvoVillanueva/datos_aFAvor_
 
 combine_word <- function(license_license_str15, rival, logo_cuadrado) {
   glue::glue(
-    "<div style='display: flex; align-items: center; text-align: left; line-height: 12px;'>
+    "<div style='display: flex; align-items: center; text-align: left; line-height: 18px;'>
       <img style='
-        height: 28px;
+        height: 30px;
         width: auto;
         margin-right: 6px;'
         src='{logo_cuadrado}'/>
       <div style='display: flex; flex-direction: column;'>
-        <span style='font-weight: 700; font-variant: small-caps; font-size: 15px;'>{license_license_str15}</span>
-        <span style='font-weight: 400; color: grey; font-variant: small-caps; font-size: 10px;'>{rival}</span>
+        <span style='font-weight: 700; font-variant: small-caps; font-size: 14px;'>{license_license_str15}</span>
+        <span style='font-weight: 400; color: grey; font-variant: small-caps; font-size: 9px;'>{rival}</span>
       </div>
     </div>"
   )

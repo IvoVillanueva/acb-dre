@@ -17,6 +17,7 @@ df <- jornada_dre %>%
     usg_pct = 100 *
       ((fga + 0.44 * fta + turnovers) * (team_minutes / 5)) /
       (time_played * (team_fga + 0.44 * team_fta + team_tov)),
+    usg_pct = ifelse(is.finite(usg_pct), usg_pct, 0),
     dre =
       0.79 * points
         - 0.72 * x2pt_tried

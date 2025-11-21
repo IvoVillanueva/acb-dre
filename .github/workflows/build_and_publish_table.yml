@@ -19,16 +19,11 @@ jobs:
       - name: Setup Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Install R packages
-        run: |
-          Rscript -e 'install.packages(c(
-            "tidyverse",
-            "reactable",
-            "reactablefmtr",
-            "htmltools",
-            "readr",
-            "dplyr"
-          ))'
+      - name: Install CRAN packages
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with: 
+          packages: tidyverse, janitor, reactable, htmltools
+          extra-packages: andreweatherman/gtUtils                     
 
       - name: Render DRE Table
         run: |

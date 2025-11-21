@@ -47,3 +47,9 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Archivos generados por Quarto (NO se suben)
+*_files/
+*.html
+tabla_dre_files/
+tabla_dre.html

@@ -19,7 +19,7 @@ jobs:
       - name: Install CRAN packages
         uses: r-lib/actions/setup-r-dependencies@v2
         with: 
-          packages: tidyverse, janitor, reactable, reactablefmtr, htmltools 
+          packages: tidyverse, janitor, reactable, htmltools,  
      
       - name: Render table
         run: quarto render tabla_dre.qmd

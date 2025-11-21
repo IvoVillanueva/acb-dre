@@ -1,0 +1,11 @@
+project:
+  type: website
+
+format:
+  html:
+    theme: cosmo
+    toc: false
+
+website:
+  navbar: false
+  page-navigation: false

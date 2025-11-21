@@ -15,20 +15,6 @@ knitr::opts_chunk$set(echo = FALSE)
 options(reactable.static = TRUE)
 ```
 
-```{css ref.label="styles", echo=FALSE}
-```
-
-```{r ref.label="font_styles", echo=FALSE}
-```
-
-```{css ref.label="pkgdown_styles", echo=FALSE}
-```
-
-
-```{r ref.label="table", eval=FALSE}
-```
-
-
 ```{r}
 source("scripts/acb_dre.R")
 

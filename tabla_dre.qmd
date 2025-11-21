@@ -35,7 +35,7 @@ source("scripts/acb_dre.R")
 tbla <- reactable(
   df %>%
     mutate(dre = round(dre, 1)) %>%
-    select(-equipo, -abb, -rival, -matches, -logo_cuadrado),
+    select(-equipo, -abb, -rival, -matches, -percentil_val, -percentil_dre, -logo_cuadrado),
   columns = list(
     license_license_str15 = colDef(
       sticky = "left",
@@ -52,82 +52,111 @@ tbla <- reactable(
         )
       }
     ),
-    time_played = colDef( name = "Min", minWidth = 15, align = "right", vAlign = "center"),
+    val = colDef(
+      html = TRUE,
+      minWidth = 11,
+      align = "center",
+      name = "Val",
+      cell = function(value, index) {
+        sprintf(
+          "
+      <div style='line-height:1; display:flex; flex-direction:column; justify-content:center;'>
+      <div style='font-size:12px; padding-top:7.5px;'>%s</div>
+      <div style='font-size:6px; font-weight:500; color:gray;'>%s</div>
+      </div>",
+          value, # ← arriba VA val (contenido original)
+          df$percentil_val[index] # ← abajo VA percentil_val
+        )
+      }
+    ),
+    dre = colDef(
+      html = TRUE,
+      align = "center",
+      minWidth = 11,
+      name = "DRE",
+      cell = function(value, index) {
+        sprintf(
+          "
+      <div style='line-height:1; display:flex; flex-direction:column; justify-content:center;'>
+        <div style='font-size:12px; padding-top:7.5px;'>%s</div>
+        <div style='font-size:6px; font-weight:500;'>%s</div>
+      </div>",
+          value,
+          df$percentil_dre[index]
+        )
+      },
+      style = function(value, index) {
+        # fondo (tu gradiente o escala original)
+        scaled_bg <- (value - min(df$dre)) / (max(df$dre) - min(df$dre))
+        background_color <- dre_rating_color(scaled_bg)
+
+        # SOLO blanco o negro
+        font_color <- make_font_pal(index, df$percentil_dre)
+
+        list(
+          background = background_color,
+          color = font_color
+        )
+      }
+    ),
+    time_played = colDef(name = "Min", minWidth = 15, align = "right", vAlign = "center"),
     ts_pct = colDef(name = "Ts%", minWidth = 15, align = "right", vAlign = "center"),
     usg_pct = colDef(name = "Usg%", minWidth = 15, align = "right", vAlign = "center"),
-    points = colDef(name = "Pts", minWidth = 10, vAlign = "center"),
-    asis = colDef(name = "Ast", minWidth = 10, vAlign = "center"),
-    total_rebound = colDef(name = "Reb", minWidth = 10, vAlign = "center"),
-    turnovers = colDef(name = "Tot", minWidth = 10, vAlign = "center"),
-    steals = colDef(name = "Stl", minWidth = 10, vAlign = "center"),
-    blocks = colDef(name = "Blk", minWidth = 10, vAlign = "center"),
+    points = colDef(name = "Pts", minWidth = 9, vAlign = "center"),
+    asis = colDef(name = "Ast", minWidth = 9, vAlign = "center"),
+    total_rebound = colDef(name = "Reb", minWidth = 9, vAlign = "center"),
+    turnovers = colDef(name = "Tot", minWidth = 9, vAlign = "center"),
+    steals = colDef(name = "Stl", minWidth = 9, vAlign = "center"),
+    blocks = colDef(name = "Blk", minWidth = 9, vAlign = "center"),
     x2pm_a = colDef(name = "2pt", minWidth = 10, align = "right", vAlign = "center"),
     x3pm_a = colDef(name = "3pt", minWidth = 10, align = "right", vAlign = "center"),
     x1pm_a = colDef(name = "1pt", minWidth = 10, align = "right", vAlign = "center"),
-    val = colDef(name = "Val", minWidth = 10, align = "center", vAlign = "center"),
-    dre = colDef(name = "Dre", minWidth = 10, align = "center", vAlign = "center"),
-    differential = colDef(name = "+/-", minWidth = 10, vAlign = "center")
+    differential = colDef(name = "+/-", minWidth = 10, align = "right", vAlign = "center")
   ),
   pagination = TRUE,
   filterable = TRUE,
-
   highlight = TRUE,
   height = "800",
   width = "100%",
   defaultPageSize = 25,
   theme = reactableTheme(
-    header = list(  
+    header = list(
       borderBottom = "3px solid black",
       textAlign = "center" # centra los nombres del header,
-        
     ),
     style = list(
       fontFamily = "Oswald",
-      fontSize = "8.1pt"
+      fontSize = "12px"
     )
   )
 )
 
-
- div(
-  class = "standings",
-  div(
-    class = "title",
-    h1("Los Mejores De La Jornada 7"),
-    "Filtrados por el RAPM Estimate (DRE) por defecto."
-  ),
+div(
+  logo_header,
   tbla,
-  "Forecast from before 3rd group matches"
+  div(
+    class = "caption",
+    caption
+  )
 )
-
-
 ```
 
 ```{r font_styles, eval=FALSE}
 htmltools::tags$link(
   href = "https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap",
-  rel  = "stylesheet"
+  rel  = "stylesheet",
+  htmltools::tags$link( 
+  href="path/to/font-awesome/css/font-awesome.min.css",
+  rel="stylesheet" )
 )
 ```
 
+
 ```{css styles}
 
-.standings {
+.caption{
+  margin-top:1rem;
   font-family: Oswald, sans-serif;
-  font-style:700;
-  overflow-y: auto;
-  
-}
-.title {
-  margin-top:3rem
-  margin-bottom: 1.125rem;
- font-family: Oswald, sans-serif;
-  font-size: 1.2rem;
-}
-
-.title h1 {
-line-height: .2px;
-  font-size: 1.65rem;
-  font-weight: 600;
+  font-size: .5rem;
 }
 ```

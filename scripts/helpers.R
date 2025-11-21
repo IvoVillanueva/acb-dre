@@ -51,14 +51,58 @@ totales_equipo <-jornada_dre %>%
   )
 
 
+caption <- htmltools::HTML(
+  "<b>Datos</b>:@ACBCOM • <b>Gráfico</b>: <i>Ivo Villanueva</i> •
+   <span style='color:#000000;font-family:\"Font Awesome 6 Brands\"'>&#xE61A;</span>
+   @elcheff • 
+   <span style='color:#E1306C;font-family:\"Font Awesome 6 Brands\"'>&#xE055;</span>
+   @sport_iv0 • 
+   <span style='color:#000000;font-family:\"Font Awesome 6 Brands\"'>&#xF092;</span>
+   IvoVillanueva"
+)
 
-twitter <- "<span style='color:#000000;font-family: \"Font Awesome 6 Brands\"'>&#xE61A;</span>"
-tweetelcheff <- "<span style='font-weight:bold;'>*@elcheff*</span>"
-insta <- "<span style='color:#E1306C;font-family: \"Font Awesome 6 Brands\"'>&#xE055;</span>"
-instaelcheff <- "<span style='font-weight:bold;'>*@sport_iv0*</span>"
-github <- "<span style='color:#000000;font-family: \"Font Awesome 6 Brands\"'>&#xF092;</span>"
-githubelcheff <- "<span style='font-weight:bold;'>*IvoVillanueva*</span>"
-caption <- glue::glue("**Datos**:@ACBCOM • **Gráfico**: *Ivo Villanueva* • {twitter} {tweetelcheff} • {insta} {instaelcheff} • {github} {githubelcheff}")
+make_color_pal <- function(colors, bias = 1) {
+  get_color <- colorRamp(colors, bias = bias)
+  function(x) rgb(get_color(x), maxColorValue = 255)
+}
 
+dre_rating_color <- make_color_pal(c("#ff2700", "#f8fcf8", "#00740EBF"), bias = 2)
+
+make_font_pal <- function(index, vec_pct) {
+  if (vec_pct[index] >= 94) {
+    "white"
+  } else {
+    "black"
+  }
+}
+
+jor_max <- max(jornada_dre$num_jornada)
+
+logo_header <- htmltools::HTML(paste0(
+  "<div style='text-align:left; font-family: Oswald;'>
+
+    <!-- LOGO -->
+    <div style='margin-bottom:6px;'>
+      <img src='https://raw.githubusercontent.com/IvoVillanueva/data/refs/heads/main/elcheff_thecleanshotlogo.png'
+           style='width:44px; height:44px;' />
+    </div>
+
+    <!-- TITULO -->
+    <div style='font-size:28px; font-weight:600; line-height:1.1; margin-bottom:4px;'>
+      Los Mejores De La Jornada ",jor_max, "
+    </div>
+
+    <!-- SUBTITULO -->
+    <div style='font-size:12px; font-weight:400; color:#8C8C8C; line-height:1.2;'>
+      Filtrados por el  <a href='https://fansided.com/2017/04/10/updating-dre-tweaks/'
+         style='color:#000; text-decoration:none; font-weight:500;'
+         target='_blank'>
+         <i>RAPM Estimate (DRE)</i>
+      </a> por defecto | ACB 25/26
+    </div>
+
+  </div>
+")
+)
 
 jor_max <- max(jornada_dre$num_jornada)

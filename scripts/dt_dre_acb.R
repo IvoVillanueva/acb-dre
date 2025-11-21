@@ -1,6 +1,6 @@
 source("scripts/acb_dre.R")
 
-
+#"#409646"
 tabla <- df %>%
   mutate(dre = round(dre, 1)) %>% 
   select(-equipo, -abb, -rival, -matches, -logo_cuadrado) %>% 

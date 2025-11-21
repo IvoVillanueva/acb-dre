@@ -43,12 +43,15 @@ df <- jornada_dre %>%
     equipo = ifelse(abb == local_team_team_abbrev_name,
       local_team_team_actual_name,
       visitor_team_team_actual_name
-    )
+    ),
+    percentil_val = round(percent_rank(val),3)*100,
+    percentil_dre = round(percent_rank(dre),3)*100,,
+    differential = ifelse( differential > 0,paste0("+", differential), differential)
   ) %>%
   select(
     abb, equipo, license_license_str15,
     matches, time_played, ts_pct, usg_pct, points, total_rebound, asis, turnovers,
-    steals, blocks, x2pm_a, x3pm_a, x1pm_a, differential, val, dre
+    steals, blocks, x2pm_a, x3pm_a, x1pm_a, differential, val, percentil_val, dre, percentil_dre
   ) %>%
   arrange(desc(dre)) %>%
   left_join(racha, join_by(abb)) %>%

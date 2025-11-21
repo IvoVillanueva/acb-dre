@@ -6,6 +6,7 @@ library(gtExtras)
 library(gtUtils)
 library(reactable)
 library(htmltools)
+
 # datos
 racha <- read_csv(
   "https://raw.githubusercontent.com/IvoVillanueva/pbp-acb-2025-26/refs/heads/main/data/last_result.csv",

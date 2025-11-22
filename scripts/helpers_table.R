@@ -54,6 +54,18 @@ make_font_pal <- function(index, vec_pct) {
   if (vec_pct[index] >= 94) "white" else "black"
 }
 
+# Compute team-level totals required for usage/TS% formulas
+totales_equipo <- jornada_dre %>% 
+  filter(num_jornada == max(num_jornada) & !is.na(license_license_str15)) %>%
+  group_by(id_match, abb) %>% 
+  summarise(
+    team_fga     = sum(x2pt_tried + x3pt_tried, na.rm = TRUE),
+    team_fta     = sum(x1pt_tried, na.rm = TRUE),
+    team_tov     = sum(turnovers, na.rm = TRUE),
+    team_minutes = sum(time_played, na.rm = TRUE),
+    .groups = "drop"
+  )
+
 # Caption block with social + credits (HTML-ready)
 caption <- htmltools::HTML(
   "<b>Datos</b>:@ACBCOM • <b>Gráfico</b>: <i>Ivo Villanueva</i> •

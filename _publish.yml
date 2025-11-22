@@ -1,3 +1,1 @@
-publish:
-  - source: .
-    quarto-pub: true
+tabla_dre.qmd: {}

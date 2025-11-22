@@ -1,9 +1,9 @@
 name: Build and Publish ACB DRE Table
 
 on:
-  workflow_dispatch:      
+  workflow_dispatch:
   schedule:
-    - cron: "0 5 * * 1"   
+    - cron: "0 5 * * 1"
 
 jobs:
   build-and-publish:
@@ -14,17 +14,14 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      # 1) Descargar el repositorio
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # 2) Instalar R
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: "release"
 
-      # 3) Cache real de paquetes R
       - name: Cache R packages
         uses: actions/cache@v4
         with:
@@ -33,7 +30,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-
 
-      # 4) Instalar solo los paquetes necesarios (AHORA SIN ERRORES)
       - name: Install required packages
         run: |
           pkgs <- c(
@@ -44,20 +40,19 @@ jobs:
             "glue",
             "lubridate"
           )
-
           to_install <- setdiff(pkgs, installed.packages()[, "Package"])
-
           if (length(to_install) > 0) {
             install.packages(to_install)
           }
         shell: Rscript {0}
 
-      # 5) Renderizar el .qmd
+      - name: Install Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
       - name: Render QMD
         run: |
           quarto render tabla_dre.qmd
 
-      # 6) Publicar en Quarto Pub
       - name: Publish to Quarto Pub
         uses: quarto-dev/quarto-actions/publish@v2
         with:

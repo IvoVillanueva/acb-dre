@@ -21,12 +21,10 @@ jobs:
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: "release"
-          # ESTA ES LA CLAVE DE LA VELOCIDAD:
-          # Obliga a usar binarios precompilados en Linux (como en Windows/Mac)
+          # La clave de la velocidad: usar binarios precompilados.
           use-public-rspm: true
 
-      # --- CACHÉ RENOVADO ---
-      # He cambiado la key a 'v2' para ignorar cachés antiguos lentos
+      # --- CACHÉ OPTIMIZADO ---
       - name: Cache R packages
         uses: actions/cache@v4
         with:
@@ -38,7 +36,6 @@ jobs:
       - name: Install CRAN packages
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          # Al usar 'use-public-rspm: true' arriba, esto tardará segundos, no minutos.
           packages: |
             tidyverse
             janitor
@@ -58,11 +55,13 @@ jobs:
           export R_LIBS_USER=${{ env.R_LIBS_USER }}
           quarto render tabla_dre.qmd
 
-      - name: Publish to Quarto Pub
-        uses: quarto-dev/quarto-actions/publish@v2
-        with:
-          target: quarto-pub
-          path: tabla_dre.qmd
-          render: false
+      # --- SOLUCIÓN FINAL A "_publish.yml" ---
+      # Ejecutamos el comando de publicación, pasando el token explícitamente como env
+      # para evitar que Quarto busque archivos de configuración.
+      - name: Publish to Quarto Pub (CLI Directo)
         env:
           QUARTO_PUB_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}
+        run: |
+          # El comando 'quarto publish' detectará automáticamente el token en la variable
+          # de entorno QUARTO_PUB_TOKEN y lo usará.
+          quarto publish quarto-pub tabla_dre.qmd --no-render --no-prompt

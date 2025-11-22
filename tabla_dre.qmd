@@ -50,12 +50,12 @@ tbla <- reactable(
       <div style='font-size:12px; padding-top:7.5px;'>%s</div>
       <div style='font-size:6px; font-weight:500; color:gray;'>%s</div>
       </div>",
-          value, # ← arriba VA val (contenido original)
-          df$percentil_val[index] # ← abajo VA percentil_val
+          value, 
+          df$percentil_val[index] 
         )
       }
     ),
-   dre = colDef(
+    dre = colDef(
       html = TRUE,
       align = "center",
       minWidth = 11,
@@ -126,7 +126,7 @@ tbla <- reactable(
   theme = reactableTheme(
     header = list(
       borderBottom = "3px solid black",
-      textAlign = "center" # centra los nombres del header,
+      textAlign = "center" 
     ),
     style = list(
       fontFamily = "Oswald",
@@ -143,6 +143,7 @@ div(
     caption
   )
 )
+
 ```
 
 ```{r font_styles, eval=FALSE}

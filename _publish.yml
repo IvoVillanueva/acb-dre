@@ -1,5 +1,2 @@
-tabla_dre.qmd:
-
-quarto-pub:
-
-id: ~
+- source: .
+  quarto-pub: true

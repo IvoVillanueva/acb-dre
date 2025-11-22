@@ -61,7 +61,7 @@ jobs:
         uses: quarto-dev/quarto-actions/publish@v2
         with:
           target: quarto-pub
-          path: .
+          path:
           render: false
         env:
           QUARTO_PUB_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}

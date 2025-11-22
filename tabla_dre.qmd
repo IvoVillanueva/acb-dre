@@ -72,24 +72,28 @@ tbla <- reactable(
         )
       },
       style = function(value, index) {
-        # --- FIX PARA EL ERROR 'rgb() NA' ---
+        # --- FIX ROBUSTO ---
         
-        # 1. Si el valor es NA, devolvemos fondo blanco y paramos aquí.
+        # 1. Protección contra NAs
         if (is.na(value)) {
           return(list(background = "#ffffff", color = "#000000"))
         }
 
-        # 2. Calculamos min y max ignorando NAs (na.rm = TRUE)
+        # 2. Calculamos min y max (usando el df original para el rango real)
         min_dre <- min(df$dre, na.rm = TRUE)
         max_dre <- max(df$dre, na.rm = TRUE)
         
-        # Protección extra: Si min == max (todos iguales), evitamos división por cero
         if (max_dre == min_dre) {
            return(list(background = "#ffffff", color = "#000000"))
         }
 
-        # Calculamos la escala
+        # 3. Calculamos la escala
         scaled_bg <- (value - min_dre) / (max_dre - min_dre)
+        
+        # 4. --- CLAMPING (NUEVO) ---
+        # Esto es vital: corrige el error causado por redondear 'dre' a 1 decimal.
+        # Si value (12.6) < min_dre (12.64), scaled sería negativo. Esto lo fuerza a ser 0.
+        scaled_bg <- max(0, min(1, scaled_bg))
         
         # Generamos el color
         background_color <- dre_rating_color(scaled_bg)

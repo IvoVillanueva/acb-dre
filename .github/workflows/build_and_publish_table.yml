@@ -14,7 +14,6 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-
       - name: Checkout repo
         uses: actions/checkout@v4
 
@@ -23,19 +22,30 @@ jobs:
         with:
           r-version: "release"
 
+      # --- OPTIMIZACIÓN DEL CACHÉ ---
+      # Usamos ${{ env.R_LIBS_USER }} para que coincida exactamente con donde R instala los paquetes.
       - name: Cache R packages
         uses: actions/cache@v4
         with:
-          path: ~/.cache/R
-          key: ${{ runner.os }}-r-${{ hashFiles('scripts/*.R') }}
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-${{ hashFiles('scripts/*.R') }}-${{ hashFiles('tabla_dre.qmd') }}
           restore-keys: |
             ${{ runner.os }}-r-
 
-        
+      # --- CORRECCIÓN DEL ERROR ---
+      # Se añaden 'rmarkdown' y 'knitr' explícitamente.
       - name: Install CRAN packages
         uses: r-lib/actions/setup-r-dependencies@v2
-        with: 
-          packages: tidyverse, janitor, glue, htmltools, reactable, lubridate
+        with:
+          packages: |
+            tidyverse
+            janitor
+            glue
+            htmltools
+            reactable
+            lubridate
+            rmarkdown
+            knitr
           shell: Rscript {0}
 
       - name: Install Quarto
@@ -43,7 +53,8 @@ jobs:
 
       - name: Render QMD
         run: |
-          export R_LIBS_USER=$HOME/.cache/R
+          # Nos aseguramos de que Quarto vea la librería correcta
+          export R_LIBS_USER=${{ env.R_LIBS_USER }}
           quarto render tabla_dre.qmd
 
       - name: Publish to Quarto Pub

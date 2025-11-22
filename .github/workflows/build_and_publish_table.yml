@@ -23,7 +23,6 @@ jobs:
           r-version: "release"
 
       # --- OPTIMIZACIÓN DEL CACHÉ ---
-      # Usamos ${{ env.R_LIBS_USER }} para que coincida exactamente con donde R instala los paquetes.
       - name: Cache R packages
         uses: actions/cache@v4
         with:
@@ -32,8 +31,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-
 
-      # --- CORRECCIÓN DEL ERROR ---
-      # Se añaden 'rmarkdown' y 'knitr' explícitamente.
+      # --- INSTALACIÓN DE PAQUETES ---
       - name: Install CRAN packages
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -53,7 +51,6 @@ jobs:
 
       - name: Render QMD
         run: |
-          # Nos aseguramos de que Quarto vea la librería correcta
           export R_LIBS_USER=${{ env.R_LIBS_USER }}
           quarto render tabla_dre.qmd
 
@@ -61,7 +58,8 @@ jobs:
         uses: quarto-dev/quarto-actions/publish@v2
         with:
           target: quarto-pub
-          path:
+          # --- AQUÍ ESTABA EL ERROR (ESTABA VACÍO) ---
+          path: tabla_dre.qmd
           render: false
         env:
           QUARTO_PUB_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}

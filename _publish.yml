@@ -1,0 +1,5 @@
+Este archivo es un placeholder necesario para que Quarto CLI (Command Line Interface)
+
+permita la publicación en un entorno no interactivo como GitHub Actions.
+
+No contiene configuraciones reales; todas se pasan vía el workflow YAML.

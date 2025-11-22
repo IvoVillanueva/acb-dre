@@ -1,33 +1,62 @@
-name: Build and Publish DRE Table
+name: Build and Publish ACB DRE Table
 
 on:
+  workflow_dispatch:     # ejecuta manualmente
   schedule:
-    - cron: "0 6 * * MON"
-  workflow_dispatch:
+    - cron: "0 5 * * 1"   
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
 
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
     steps:
-      - uses: actions/checkout@v3
+      # 1) Descargar el repositorio
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - uses: r-lib/actions/setup-r@v2
+      # 2) Instalar R (muy rápido)
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
 
-      - uses: quarto-dev/quarto-actions/setup@v2
-      
-      - name: Install CRAN packages
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with: 
-          packages: tidyverse, glue, janitor, reactable, htmltools  
-     
-      - name: Render table
-        run: quarto render tabla_dre.qmd
+      # 3) Cache real de paquetes R (gran aceleración)
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/R
+          key: ${{ runner.os }}-r-${{ hashFiles('scripts/*.R') }}
+          restore-keys: |
+            ${{ runner.os }}-r-
 
+      # 4) Instalar solo los paquetes necesarios
+      - name: Install required packages
+        run: |
+          pkgs <- c(
+            "tidyverse",
+            "janitor",
+            "reactable",
+            "htmltools",
+            "glue",
+            "lubridate"
+          )
+          install.packages(setdiff(pkgs, installed.packages()[, "Package"]))
+
+      # 5) Renderizar tu documento .qmd
+      - name: Render QMD
+        run: |
+          quarto render tabla_dre.qmd
+
+      # 6) Publicar en Quarto Pub
       - name: Publish to Quarto Pub
         uses: quarto-dev/quarto-actions/publish@v2
         with:
           target: quarto-pub
-          path: tabla_dre.qmd
+          path: .
+          render: false
         env:
           QUARTO_PUB_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}

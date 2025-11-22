@@ -31,22 +31,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-
 
-      - name: Install required packages
-        run: |
-          .libPaths("~/.cache/R")
-
-          pkgs <- c(
-            "tidyverse",
-            "janitor",
-            "reactable",
-            "htmltools",
-            "glue",
-            "lubridate"
-          )
-
-          to_install <- setdiff(pkgs, installed.packages()[,"Package"])
-          if (length(to_install) > 0) install.packages(to_install)
-        shell: Rscript {0}
+        
+      - name: Install CRAN packages
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with: 
+          packages: tidyverse, janitor, glue, htmltools, reactable, lubridate
+          shell: Rscript {0}
 
       - name: Install Quarto
         uses: quarto-dev/quarto-actions/setup@v2

@@ -16,7 +16,7 @@ options(reactable.static = TRUE)
 ```
 
 ```{r}
-source("scripts/acb_dre.R")
+source("scripts/acb_dre_table.R")
 
 tbla <- reactable(
   df %>%

@@ -1,4 +1,4 @@
-source("scripts/acb_dre.R")
+source("scripts/acb_dre_gt.R")
 
 # asegurar que la carpeta data existe
 if (!dir.exists("png")) dir.create("png")

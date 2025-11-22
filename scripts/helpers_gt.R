@@ -1,28 +1,32 @@
-# librerias
+# Load libraries required for GT table generation and PNG export
 library(tidyverse)
 library(janitor)
 library(gt)
 library(gtExtras)
 library(gtUtils)
-library(reactable)
-library(htmltools)
 
-# datos
+# Load last game results (used for rival streak formatting)
 racha <- read_csv(
   "https://raw.githubusercontent.com/IvoVillanueva/pbp-acb-2025-26/refs/heads/main/data/last_result.csv",
   show_col_types = FALSE
 )
 
+# Load boxscore data for DRE computation
 jornada_dre <- read_csv(
   "https://raw.githubusercontent.com/IvoVillanueva/pbp-acb-2025-26/refs/heads/main/data/boxscores_2025_26.csv",
   show_col_types = FALSE
-) 
+)
 
-# Load club logos data
-clubs <- read.csv("https://raw.githubusercontent.com/IvoVillanueva/datos_aFAvor_eContra/refs/heads/main/2026/clubs_logosCuadrados.csv") %>% 
+# Load team logos (square icons)
+clubs <- read.csv(
+  "https://raw.githubusercontent.com/IvoVillanueva/datos_aFAvor_eContra/refs/heads/main/2026/clubs_logosCuadrados.csv"
+) %>% 
   select(abb, logo_cuadrado)
 
-
+# Build HTML block containing:
+# - player name
+# - rival W/L streak
+# - club logo
 combine_word <- function(license_license_str15, rival, logo_cuadrado) {
   glue::glue(
     "<div style='display: flex; align-items: center; text-align: left; line-height: 13px;'>
@@ -39,8 +43,8 @@ combine_word <- function(license_license_str15, rival, logo_cuadrado) {
   )
 }
 
-
-totales_equipo <-jornada_dre %>% 
+# Compute team-level totals required for usage/TS% formulas
+totales_equipo <- jornada_dre %>% 
   filter(num_jornada == max(num_jornada) & !is.na(license_license_str15)) %>%
   group_by(id_match, abb) %>% 
   summarise(
@@ -51,7 +55,7 @@ totales_equipo <-jornada_dre %>%
     .groups = "drop"
   )
 
-
+# Credits + social caption (HTML formatted for GT footer)
 caption <- htmltools::HTML(
   "<b>Datos</b>:@ACBCOM • <b>Gráfico</b>: <i>Ivo Villanueva</i> •
    <span style='color:#000000;font-family:\"Font Awesome 6 Brands\"'>&#xE61A;</span>
@@ -62,48 +66,5 @@ caption <- htmltools::HTML(
    IvoVillanueva"
 )
 
-make_color_pal <- function(colors, bias = 1) {
-  get_color <- colorRamp(colors, bias = bias)
-  function(x) rgb(get_color(x), maxColorValue = 255)
-}
-
-dre_rating_color <- make_color_pal(c("#ff2700", "#f8fcf8", "#00740EBF"), bias = 2)
-
-make_font_pal <- function(index, vec_pct) {
-  if (vec_pct[index] >= 94) {
-    "white"
-  } else {
-    "black"
-  }
-}
-
-jor_max <- max(jornada_dre$num_jornada)
-
-logo_header <- htmltools::HTML(paste0(
-  "<div style='text-align:left; font-family: Oswald;'>
-
-    <!-- LOGO -->
-    <div style='margin-bottom:6px;'>
-      <img src='https://raw.githubusercontent.com/IvoVillanueva/data/refs/heads/main/elcheff_thecleanshotlogo.png'
-           style='width:44px; height:44px;' />
-    </div>
-
-    <!-- TITULO -->
-    <div style='font-size:28px; font-weight:600; line-height:1.1; margin-bottom:4px;'>
-      Los Mejores De La Jornada ",jor_max, "
-    </div>
-
-    <!-- SUBTITULO -->
-    <div style='font-size:12px; font-weight:400; color:#8C8C8C; line-height:1.2;'>
-      Filtrados por el  <a href='https://fansided.com/2017/04/10/updating-dre-tweaks/'
-         style='color:#000; text-decoration:none; font-weight:500;'
-         target='_blank'>
-         <i>RAPM Estimate (DRE)</i>
-      </a> por defecto | ACB 25/26
-    </div>
-
-  </div>
-")
-)
-
+# Extract last jornada number (used in GT title)
 jor_max <- max(jornada_dre$num_jornada)

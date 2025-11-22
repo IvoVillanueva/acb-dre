@@ -66,6 +66,33 @@ totales_equipo <- jornada_dre %>%
     .groups = "drop"
   )
 
+logo_header <- htmltools::HTML(paste0(
+  "<div style='text-align:left; font-family: Oswald;'>
+
+    <!-- LOGO -->
+    <div style='margin-bottom:6px;'>
+      <img src='https://raw.githubusercontent.com/IvoVillanueva/data/refs/heads/main/elcheff_thecleanshotlogo.png'
+           style='width:44px; height:44px;' />
+    </div>
+
+    <!-- TITULO -->
+    <div style='font-size:28px; font-weight:600; line-height:1.1; margin-bottom:4px;'>
+      Los Mejores De La Jornada ",jor_max, "
+    </div>
+
+    <!-- SUBTITULO -->
+    <div style='font-size:12px; font-weight:400; color:#8C8C8C; line-height:1.2;'>
+      Filtrados por el  <a href='https://fansided.com/2017/04/10/updating-dre-tweaks/'
+         style='color:#000; text-decoration:none; font-weight:500;'
+         target='_blank'>
+         <i>RAPM Estimate (DRE)</i>
+      </a> por defecto | ACB 25/26
+    </div>
+
+  </div>
+")
+)
+
 # Caption block with social + credits (HTML-ready)
 caption <- htmltools::HTML(
   "<b>Datos</b>:@ACBCOM • <b>Gráfico</b>: <i>Ivo Villanueva</i> •

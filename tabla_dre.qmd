@@ -55,7 +55,7 @@ tbla <- reactable(
         )
       }
     ),
-    dre = colDef(
+   dre = colDef(
       html = TRUE,
       align = "center",
       minWidth = 11,
@@ -72,11 +72,29 @@ tbla <- reactable(
         )
       },
       style = function(value, index) {
-        # fondo (tu gradiente o escala original)
-        scaled_bg <- (value - min(df$dre)) / (max(df$dre) - min(df$dre))
+        # --- FIX PARA EL ERROR 'rgb() NA' ---
+        
+        # 1. Si el valor es NA, devolvemos fondo blanco y paramos aquí.
+        if (is.na(value)) {
+          return(list(background = "#ffffff", color = "#000000"))
+        }
+
+        # 2. Calculamos min y max ignorando NAs (na.rm = TRUE)
+        min_dre <- min(df$dre, na.rm = TRUE)
+        max_dre <- max(df$dre, na.rm = TRUE)
+        
+        # Protección extra: Si min == max (todos iguales), evitamos división por cero
+        if (max_dre == min_dre) {
+           return(list(background = "#ffffff", color = "#000000"))
+        }
+
+        # Calculamos la escala
+        scaled_bg <- (value - min_dre) / (max_dre - min_dre)
+        
+        # Generamos el color
         background_color <- dre_rating_color(scaled_bg)
 
-        # SOLO blanco o negro
+        # Calculamos el color de la fuente
         font_color <- make_font_pal(index, df$percentil_dre)
 
         list(

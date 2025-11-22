@@ -66,6 +66,9 @@ totales_equipo <- jornada_dre %>%
     .groups = "drop"
   )
 
+# Extract last jornada number (used in GT title)
+jor_max <- max(jornada_dre$num_jornada)
+
 logo_header <- htmltools::HTML(paste0(
   "<div style='text-align:left; font-family: Oswald;'>
 

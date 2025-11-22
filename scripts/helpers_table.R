@@ -1,18 +1,16 @@
-# Load required libraries for reactable pipeline
-library(tidyverse)
-library(janitor)
-library(reactable)
-library(htmltools)
-library(glue)
+# Este script contiene funciones helper y la carga de datos.
+# Las librerías requeridas (tidyverse, janitor, glue, etc.) DEBEN 
+# cargarse en el archivo principal (acb_dre_table.R o tabla_dre.qmd) 
+# antes de hacer 'source("scripts/helpers_table.R")'.
 
 # Load latest results (rival form: W/L streak)
-racha <- read_csv(
+racha <- readr::read_csv(
   "https://raw.githubusercontent.com/IvoVillanueva/pbp-acb-2025-26/refs/heads/main/data/last_result.csv",
   show_col_types = FALSE
 )
 
 # Load boxscore data for DRE calculations
-jornada_dre <- read_csv(
+jornada_dre <- readr::read_csv(
   "https://raw.githubusercontent.com/IvoVillanueva/pbp-acb-2025-26/refs/heads/main/data/boxscores_2025_26.csv",
   show_col_types = FALSE
 )
@@ -21,7 +19,7 @@ jornada_dre <- read_csv(
 clubs <- read.csv(
   "https://raw.githubusercontent.com/IvoVillanueva/datos_aFAvor_eContra/refs/heads/main/2026/clubs_logosCuadrados.csv"
 ) %>% 
-  select(abb, logo_cuadrado)
+  dplyr::select(abb, logo_cuadrado) # Usamos dplyr::select para evitar dependencia de library()
 
 # Build player name + rival + logo HTML block
 combine_word <- function(license_license_str15, rival, logo_cuadrado) {
@@ -55,10 +53,12 @@ make_font_pal <- function(index, vec_pct) {
 }
 
 # Compute team-level totals required for usage/TS% formulas
-totales_equipo <- jornada_dre %>% 
-  filter(num_jornada == max(num_jornada) & !is.na(license_license_str15)) %>%
-  group_by(id_match, abb) %>% 
-  summarise(
+# NOTA: Usamos el operador base pipe |> para asegurar que las dependencias
+# estén cargadas en el archivo principal.
+totales_equipo <- jornada_dre |> 
+  dplyr::filter(num_jornada == max(num_jornada) & !is.na(license_license_str15)) |> 
+  dplyr::group_by(id_match, abb) |> 
+  dplyr::summarise(
     team_fga     = sum(x2pt_tried + x3pt_tried, na.rm = TRUE),
     team_fta     = sum(x1pt_tried, na.rm = TRUE),
     team_tov     = sum(turnovers, na.rm = TRUE),
@@ -106,4 +106,3 @@ caption <- htmltools::HTML(
    <span style='color:#000000;font-family:\"Font Awesome 6 Brands\"'>&#xF092;</span>
    IvoVillanueva"
 )
-

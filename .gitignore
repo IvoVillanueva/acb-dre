@@ -53,3 +53,6 @@ rsconnect/
 *.html
 tabla_dre_files/
 tabla_dre.html
+
+/.quarto/
+**/*.quarto_ipynb

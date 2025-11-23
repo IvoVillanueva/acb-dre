@@ -26,7 +26,7 @@ tbla <- reactable(
     license_license_str15 = colDef(
       sticky = "left",
       name = "",
-      width = 155,
+      width = 160,
       html = TRUE,
       cell = function(value, index) {
         htmltools::HTML(
@@ -116,15 +116,15 @@ tbla <- reactable(
     turnovers = colDef(name = "Tot", minWidth = 9, vAlign = "center"),
     steals = colDef(name = "Stl", minWidth = 9, vAlign = "center"),
     blocks = colDef(name = "Blk", minWidth = 9, vAlign = "center"),
-    x2pm_a = colDef(name = "2pt", minWidth = 10, align = "right", vAlign = "center"),
-    x3pm_a = colDef(name = "3pt", minWidth = 10, align = "right", vAlign = "center"),
-    x1pm_a = colDef(name = "1pt", minWidth = 10, align = "right", vAlign = "center"),
+    x2pm_a = colDef(name = "2pt", minWidth = 11, align = "right", vAlign = "center"),
+    x3pm_a = colDef(name = "3pt", minWidth = 11, align = "right", vAlign = "center"),
+    x1pm_a = colDef(name = "1pt", minWidth = 11, align = "right", vAlign = "center"),
     differential = colDef(name = "+/-", minWidth = 10, align = "right", vAlign = "center")
   ),
   pagination = TRUE,
   filterable = TRUE,
   highlight = TRUE,
-  height = "800",
+  height ="100%",
   width = "100%",
   defaultPageSize = 25,
   theme = reactableTheme(

@@ -1,1 +1,4 @@
-tabla_dre.qmd: {}
+- source: acb-dre.qmd
+  quarto-pub:
+    - id: 985e8791-0172-444a-a5f9-e9a76452b78a
+      url: https://ivovillanueva.quarto.pub/thecleanshot_acb_ranking_dre

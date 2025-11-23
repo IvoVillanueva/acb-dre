@@ -53,7 +53,7 @@ jobs:
       - name: Render QMD
         run: |
           export R_LIBS_USER=${{ env.R_LIBS_USER }}
-          quarto render tabla_dre.qmd
+          quarto render acb-dre.qmd
 
       # --- SOLUCIÓN FINAL A "_publish.yml" ---
       # Ejecutamos el comando de publicación, pasando el token explícitamente como env

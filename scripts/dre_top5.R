@@ -39,7 +39,7 @@ df %>%
     columns = c(val, dre)
   ) %>%
   data_color(dre, palette = c("white", "#419647"),
-             domain = range(df$dre),
+             domain = range(round(df$dre,1)),
              na_color = "#E4E4E4") %>%
   cols_label(
     combo = "",

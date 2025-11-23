@@ -62,7 +62,13 @@ df %>%
   tab_style(
     style = cell_text(size = px(10)),
     locations = cells_source_notes()
-  ) %>%
+  ) |>
+  tab_style(
+    style = cell_text(size = px(10),
+                      weight = 700,
+                      font = "Oswald"),
+    locations = cells_stub()
+  ) %>% 
   tab_header(
     title = paste0("Los 5 Mejores y Los 3 Peores De La J",jor_max) ,
     subtitle = md("Ordenados por el **Daily RAPM**")

@@ -73,3 +73,4 @@ df <- jornada_dre %>%
     ts_pct = paste0(round(ts_pct * 100, 1), "%"),
     usg_pct = paste0(round(usg_pct, 1), "%")
   )
+range(round(df$dre,1))

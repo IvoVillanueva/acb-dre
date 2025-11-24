@@ -43,9 +43,10 @@ jobs:
             purrr,
             lubridate,
             gt,
-            gtExtras
-            extra-packages: |
-            andreweatherman/gtUtils 
+            gtExtras,
+            remotes
+          extra-packages: |
+            remotes::andreweatherman/gtUtils 
           
       - name: Run R update script
         run: Rscript scripts/dre_top5.R

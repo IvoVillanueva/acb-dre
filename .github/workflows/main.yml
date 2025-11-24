@@ -61,11 +61,11 @@ jobs:
           Rscript -e 'pkgs <- c(
             "dplyr","readr","tidyr","stringr","janitor",
             "lubridate","glue","htmltools",
-            "gt","gtExtras","gtUtils"
+            "gt","gtExtras"
           );
           missing <- setdiff(pkgs, rownames(installed.packages()));
           if(length(missing)) install.packages(missing);'
-
+          extra-packages: andreweatherman/gtUtils
       # ---- Ejecutar script ----
       - name: Run R script
         run: Rscript scripts/dre_top5.R

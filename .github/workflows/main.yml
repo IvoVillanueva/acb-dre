@@ -42,7 +42,7 @@ jobs:
       - name: Install CRAN packages
         uses: r-lib/actions/setup-r-dependencies@v2
         with: 
-          packages: tidyverse, janitor, gt, gtExtras, gtUtils
+          packages: dplyr, dplyr, readr, purr, stringr, janitor, gt, gtExtras, gtUtils
           extra-packages: andreweatherman/gtUtils                            
           
       - name: Run R script

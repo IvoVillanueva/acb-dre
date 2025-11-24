@@ -65,11 +65,13 @@ jobs:
           );
           missing <- setdiff(cran_pkgs, rownames(installed.packages()));
           if (length(missing)) install.packages(missing);
-
-          if (!"gtUtils" %in% rownames(installed.packages())) {
-            remotes::install_github("andreweatherman/gtUtils")
-          }
           '
+      - name: Install gtUtils from GitHub
+        run: |
+          Rscript -e '
+          if (!"gtUtils" %in% rownames(installed.packages())) {
+           remotes::install_github("andreweatherman/gtUtils")
+          }
           
       # ---- Ejecutar script ----
       - name: Run R script

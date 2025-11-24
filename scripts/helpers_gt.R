@@ -1,5 +1,8 @@
 # Load libraries required for GT table generation and PNG export
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(stringr)
 library(janitor)
 library(gt)
 library(gtExtras)

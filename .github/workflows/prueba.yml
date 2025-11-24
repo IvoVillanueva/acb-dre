@@ -1,4 +1,4 @@
-name: Get 5 Mejores y 3 peores de la jornada
+name: Prueba Get 5 Mejores y 3 peores de la jornada
 
 on:
   workflow_dispatch:

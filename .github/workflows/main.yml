@@ -59,13 +59,13 @@ jobs:
       - name: Install only needed R packages
         run: |
           Rscript -e 'cran_pkgs <- c(
-          "dplyr","readr","tidyr","stringr","janitor",
-          "lubridate","gt","gtExtras", "remotes"
-          );
+           "dplyr","readr","tidyr","stringr","janitor",
+           "lubridate","gt","gtExtras", "remotes"
+           );
           missing <- setdiff(cran_pkgs, rownames(installed.packages()));
           if(length(missing)) install.packages(missing);'
           Rscript -e 'if(!"gtUtils" %in% rownames(installed.packages()))
-          remotes::install_github("andreweatherman/gtUtils")'
+           remotes::install_github("andreweatherman/gtUtils")'
           
       # ---- Ejecutar script ----
       - name: Run R script

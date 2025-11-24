@@ -59,24 +59,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable libcurl4-openssl-dev wget unzip fontconfig
 
-      # 3. Instalación de Fuentes Simplificada
-      - name: Install Custom Fonts (Font Awesome & Oswald)
-        run: |
-          FONT_DIR=~/.local/share/fonts
-          
-          # Font Awesome 6 Brands
-          mkdir -p ${FONT_DIR}/fa6
-          wget -O fa6.zip https://use.fontawesome.com/releases/v6.5.2/fontawesome-free-6.5.2-web.zip
-          unzip fa6.zip
-          cp fontawesome-free-6.5.2-web/webfonts/fa-brands-400.woff2 ${FONT_DIR}/fa6/
-          
-          # Oswald
-          mkdir -p ${FONT_DIR}/oswald
-          wget -O ${FONT_DIR}/oswald/Oswald.ttf https://github.com/google/fonts/raw/main/apache/oswald/Oswald-Regular.ttf
-          
-          # Actualizar el caché de fuentes una sola vez al final
-          fc-cache -f -v
-
       # 4. Instalación de Paquetes R
       - name: Install CRAN packages
         run: |

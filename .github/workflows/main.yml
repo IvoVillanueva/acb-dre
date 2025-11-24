@@ -1,98 +1,63 @@
+
+
+
 name: Get 5 Mejores y 3 peores de la jornada
 
 on:
-  # Permite ejecutar manualmente la acción
   workflow_dispatch:
-
   schedule:
-    # --- Programación ajustada a las zonas horarias de la Península (CET/CEST) ---
-    
-    # Horario de invierno (OCTUBRE a MARZO, UTC+1, que coincide con CET)
-    # Sábados (6) de 18:30 a 22:30. Domingos (0) de 12:30 a 22:30.
-    - cron: '30 18-22 * 10-12,1-3 6'
-    - cron: '30 12-22 * 10-12,1-3 0'
+    # OCTUBRE a MARZO (UTC+1)
+    - cron: '30 18-22 * 10-12,1-3 6'  # Sábados
+    - cron: '30 12-22 * 10-12,1-3 0'  # Domingos
 
-    # Horario de verano (ABRIL a SEPTIEMBRE, UTC+2, que coincide con CEST)
-    # Nota: Los cron jobs de GitHub Actions se ejecutan en UTC. 
-    # Para CET (UTC+1) y CEST (UTC+2) se necesita ajustar la hora en consecuencia.
-    
-    # Sábados (6) de 17:30 a 21:30 UTC -> (19:30 a 23:30 CEST) 
-    # Mejor cambiar el rango para asegurar la cobertura de la jornada, 
-    # especialmente si el script tarda. 
-    # Mantendré tu rango original, asumiendo que el script se ejecuta en el momento correcto para ti.
-    - cron: '30 17-21 * 4-9 6' 
-    
-    # Domingos (0) de 11:30 a 21:30 UTC -> (13:30 a 23:30 CEST)
-    - cron: '30 11-21 * 4-9 0'
+    # ABRIL a SEPTIEMBRE (UTC+2)
+    - cron: '30 17-21 * 4-9 6'  # Sábados
+    - cron: '30 11-21 * 4-9 0'  # Domingos
 
 jobs:
   Get-Boxscore-ACB:
-    name: Actualizar 5 Mejores y 3 Peores de la jornada
+    name: Actualizar 5 Mejores y 3 peores de la jornada 
     runs-on: ubuntu-latest
-    
-    # Usamos una variable de entorno GITHUB_TOKEN estándar. No es necesario GITHUB_PAT.
     env:
-      # Variable necesaria para Puppeteer/webshot2 para encontrar el ejecutable del navegador
-      CHROME_BIN: /usr/bin/google-chrome
-      
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-
-      # 1. Configuración de R y Caché
-      - name: Cache R packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/R
-          key: ${{ runner.os }}-r-cache-${{ hashFiles('scripts/*.R') }}
-          restore-keys: ${{ runner.os }}-r-cache-
-
+      - uses: actions/checkout@v3  
+      
       - uses: r-lib/actions/setup-r@v2
-        with:
+        with: 
+          use-public-rspm: true
           r-version: 'release'
-          # Usar RSPM es la mejor práctica para la velocidad de instalación
-          use-public-rspm: true 
-
-      # 2. Instalación de Dependencias del Sistema (Chromium/Chrome)
-      - name: Install system dependencies (Chrome + libcurl)
-        run: |
-          # Instalar Google Chrome, que es más estable y tiene una ruta predecible
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable libcurl4-openssl-dev wget unzip fontconfig
-
-      # 4. Instalación de Paquetes R
+          
+      - name: Install libcurl and libssl on Linux
+        run: sudo apt-get -y install libcurl4-openssl-dev 
+        shell: bash
+        
+      - name: Cache CRAN packages
+        uses: actions/cache@v3 
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-${{ hashFiles('**/DESCRIPTION') }}
+          restore-keys: ${{ runner.os }}-r-
+          
       - name: Install CRAN packages
-        run: |
-          cran_pkgs <- c(
-            "dplyr","readr","tidyr","stringr","janitor",
-            "lubridate","gt","gtExtras","remotes"
-          )
-          # Aseguramos la instalación de 'webshot2' para la captura de tablas 'gt'
-          # Si tu script usa 'webshot', asegúrate de tener 'phantomjs' o cambia a 'webshot2'
-          missing <- setdiff(c(cran_pkgs, "webshot2"), rownames(installed.packages()))
-          if (length(missing)) install.packages(missing)
-        shell: Rscript {0}
-
-      - name: Install gtUtils from GitHub
-        run: |
-          if (!"gtUtils" %in% rownames(installed.packages())) {
-            remotes::install_github("andreweatherman/gtUtils")
-          }
-        shell: Rscript {0}
-
-      # 5. Ejecución y Commit
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with: 
+          packages: tidyverse, janitor, gt, gtExtras, gtUtils
+          extra-packages: andreweatherman/gtUtils                            
+          
       - name: Run R script
         run: Rscript scripts/dre_top5.R
+        shell: bash
 
-      - name: Commit PNG updates
+      - name: Commit changes in data folder
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add png/*.png
-          # Usar "|| true" evita que la acción falle si no hay cambios (salida no-cero de git diff)
-          git diff --cached --quiet || git commit -m "Auto-update: 5 Mejores y 3 Peores" || true
+          git diff --cached --quiet || git commit -m "Auto-update: 5 Mejores y 3 Peores"
+        shell: bash
 
       - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref_name }} # Empuja a la rama actual
+        run: git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

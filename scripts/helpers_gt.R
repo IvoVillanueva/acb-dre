@@ -2,6 +2,7 @@
 library(dplyr)
 library(tidyr)
 library(readr)
+library(purr)
 library(stringr)
 library(janitor)
 library(gt)

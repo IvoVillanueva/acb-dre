@@ -66,7 +66,6 @@ df %>%
   ) |>
   tab_style(
     style = cell_text(size = px(10),
-                      weight = 700,
                       font = "Oswald"),
     locations = cells_stub()
   ) %>% 

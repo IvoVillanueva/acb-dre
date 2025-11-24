@@ -6,19 +6,19 @@ library(gtExtras)
 library(gtUtils)
 
 # Load last game results (used for rival streak formatting)
-racha <- read_csv(
+racha <- readr::read_csv(
   "https://raw.githubusercontent.com/IvoVillanueva/pbp-acb-2025-26/refs/heads/main/data/last_result.csv",
   show_col_types = FALSE
 )
 
 # Load boxscore data for DRE computation
-jornada_dre <- read_csv(
+jornada_dre <- readr::read_csv(
   "https://raw.githubusercontent.com/IvoVillanueva/pbp-acb-2025-26/refs/heads/main/data/boxscores_2025_26.csv",
   show_col_types = FALSE
 )
 
 # Load team logos (square icons)
-clubs <- read.csv(
+clubs <- readr::read.csv(
   "https://raw.githubusercontent.com/IvoVillanueva/datos_aFAvor_eContra/refs/heads/main/2026/clubs_logosCuadrados.csv"
 ) %>% 
   select(abb, logo_cuadrado)
@@ -28,26 +28,20 @@ clubs <- read.csv(
 # - rival W/L streak
 # - club logo
 combine_word <- function(license_license_str15, rival, logo_cuadrado) {
-  glue::glue(
-    "<div style='display: flex; align-items: center; text-align: left; line-height: 13px;'>
-      <img style='
-        height: 24px;
-        width: auto;
-        margin-right: 6px;'
-        src='{logo_cuadrado}'/>
+  glue::glue("
+    <div style='display: flex; align-items: center; text-align: left; line-height: 13px;'>
+      <img style='height: 24px; width: auto; margin-right: 6px;' src='{logo_cuadrado}'/>
       <div style='display: flex; flex-direction: column;'>
         <span style='font-weight: 700; font-variant: small-caps; font-size: 12px;'>{license_license_str15}</span>
         <span style='font-weight: 400; color: grey; font-variant: small-caps; font-size: 9px;'>{rival}</span>
       </div>
-    </div>"
-  )
+    </div>")
 }
-
 # Compute team-level totals required for usage/TS% formulas
 totales_equipo <- jornada_dre %>% 
-  filter(num_jornada == max(num_jornada) & !is.na(license_license_str15)) %>%
-  group_by(id_match, abb) %>% 
-  summarise(
+  dplyr::filter(num_jornada == max(num_jornada) & !is.na(license_license_str15)) %>%
+  dplyr::group_by(id_match, abb) %>% 
+  dplyr::summarise(
     team_fga     = sum(x2pt_tried + x3pt_tried, na.rm = TRUE),
     team_fta     = sum(x1pt_tried, na.rm = TRUE),
     team_tov     = sum(turnovers, na.rm = TRUE),

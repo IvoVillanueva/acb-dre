@@ -43,8 +43,7 @@ jobs:
             purrr,
             lubridate,
             gt,
-            gtExtras,
-            remotes
+            gtExtras
           extra-packages: |
             remotes::install_github(andreweatherman/gtUtils) 
           

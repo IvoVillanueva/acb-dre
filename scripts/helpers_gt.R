@@ -21,7 +21,7 @@ jornada_dre <- readr::read_csv(
 )
 
 # Load team logos (square icons)
-clubs <- readr::read.csv(
+clubs <- readr::read_csv(
   "https://raw.githubusercontent.com/IvoVillanueva/datos_aFAvor_eContra/refs/heads/main/2026/clubs_logosCuadrados.csv"
 ) %>% 
   select(abb, logo_cuadrado)

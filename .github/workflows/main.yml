@@ -68,10 +68,11 @@ jobs:
           '
       - name: Install gtUtils from GitHub
         run: |
-          Rscript -e '
+          Rscript <<'EOF'
           if (!"gtUtils" %in% rownames(installed.packages())) {
-           remotes::install_github("andreweatherman/gtUtils")
+          remotes::install_github("andreweatherman/gtUtils")
           }
+          EOF
           
       # ---- Ejecutar script ----
       - name: Run R script

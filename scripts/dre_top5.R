@@ -55,7 +55,7 @@ df %>%
     val = "VAL",
     dre = "DRE"
   ) %>%
-  gt_theme_savant() %>%
+  gtUtils::gt_theme_savant() %>%
   tab_options(
     heading.align = "left",
     table.font.names = "Oswald",

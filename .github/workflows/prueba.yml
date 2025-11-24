@@ -46,7 +46,7 @@ jobs:
             gtExtras,
             remotes
           extra-packages: |
-            remotes::andreweatherman/gtUtils 
+            remotes::install_github("andreweatherman/gtUtils") 
           
       - name: Run R update script
         run: Rscript scripts/dre_top5.R

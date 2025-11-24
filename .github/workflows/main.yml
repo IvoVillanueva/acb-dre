@@ -31,10 +31,9 @@ jobs:
       - name: Install system dependencies (Chromium + libcurl)
         run: |
           sudo apt-get update
-          sudo apt-get install -y chromium-browser libcurl4-openssl-dev wget unzip
+          sudo apt-get install -y chromium-browser libcurl4-openssl-dev wget unzip fontconfig
 
       # ---- Instalar Font Awesome 6 Brands ----
-      # Descargamos el ZIP de la versión web oficial y extraemos solo las fuentes .woff2
       - name: Install Font Awesome 6 Brands
         run: |
           mkdir -p ~/.local/share/fonts/fa6
@@ -43,11 +42,18 @@ jobs:
           cp fontawesome-free-6.5.2-web/webfonts/fa-brands-400.woff2 ~/.local/share/fonts/fa6/
           fc-cache -f -v
 
+      # ---- Instalar Oswald ----
+      - name: Install Oswald font
+        run: |
+          mkdir -p ~/.local/share/fonts/oswald
+          wget -O ~/.local/share/fonts/oswald/Oswald.ttf https://github.com/google/fonts/raw/main/apache/oswald/Oswald-Regular.ttf
+          fc-cache -f -v
+
       # ---- Configurar Chromium ----
       - name: Set Chromium Path
         run: echo "CHROME_BIN=/usr/bin/chromium-browser" >> $GITHUB_ENV
 
-      # ---- Cache ligera de R (mucho más rápido) ----
+      # ---- Cache ligera de R ----
       - name: Cache R packages
         uses: actions/cache@v3
         with:
@@ -55,26 +61,30 @@ jobs:
           key: ${{ runner.os }}-r-cache-${{ hashFiles('scripts/*.R') }}
           restore-keys: ${{ runner.os }}-r-cache-
 
-      # ---- Instalar solo los paquetes necesarios ----
-      - name: Install only needed R packages
+      # ---- Instalar paquetes CRAN ----
+      - name: Install CRAN packages
         run: |
-          Rscript -e '
-          cran_pkgs <- c(
-            "dplyr","readr","tidyr","stringr","janitor",
-            "lubridate","gt","gtExtras","remotes"
-          );
-          missing <- setdiff(cran_pkgs, rownames(installed.packages()));
-          if (length(missing)) install.packages(missing);
-          '
+          cat > install_cran.R << 'EOF'
+            cran_pkgs <- c(
+              "dplyr","readr","tidyr","stringr","janitor",
+              "lubridate","gt","gtExtras","remotes"
+            )
+            missing <- setdiff(cran_pkgs, rownames(installed.packages()))
+            if (length(missing)) install.packages(missing)
+          EOF
+          Rscript install_cran.R
+
+      # ---- Instalar gtUtils desde GitHub ----
       - name: Install gtUtils from GitHub
         run: |
-          Rscript <<'EOF'
-          if (!"gtUtils" %in% rownames(installed.packages())) {
-          remotes::install_github("andreweatherman/gtUtils")
-          }
+          cat > install_gtutils.R << 'EOF'
+            if (!"gtUtils" %in% rownames(installed.packages())) {
+              remotes::install_github("andreweatherman/gtUtils")
+            }
           EOF
-          
-      # ---- Ejecutar script ----
+          Rscript install_gtutils.R
+
+      # ---- Ejecutar script principal ----
       - name: Run R script
         run: Rscript scripts/dre_top5.R
 
@@ -86,7 +96,7 @@ jobs:
           git add png/*.png
           git diff --cached --quiet || git commit -m "Auto-update: 5 Mejores y 3 Peores"
 
-      # ---- Push ----
+      # ---- Push final ----
       - name: Push changes
         run: git push
         env:

@@ -8,40 +8,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-r@v2
 
-      # Desactivar pak
-      - name: Disable pak auto mode
-        run: |
-          echo "PREFER_PAK=false" >> $GITHUB_ENV
-          echo "R_PKG_SYSREQS2=false" >> $GITHUB_ENV
-          echo "PKG_SYSREQS=false" >> $GITHUB_ENV
-          echo "R_CONFIG_ACTIVE=false" >> $GITHUB_ENV
-
-      # Instalar paquetes CRAN necesarios
-      - name: Install CRAN packages
-        run: |
-          cat > install_cran.R << 'EOF'
-            install.packages(c(
-              "dplyr","readr","tidyr","stringr","janitor",
-              "lubridate","gt","gtExtras","remotes"
-            ))
-EOF
-          Rscript install_cran.R
-
-      # Instalar gtUtils desde GitHub
-      - name: Install gtUtils
-        run: |
-          cat > install_gtutils.R << 'EOF'
-            remotes::install_github("andreweatherman/gtUtils")
-EOF
-          Rscript install_gtutils.R
-
+      - name: Instalar dependencias de R
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            dplyr,
+            readr,
+            tidyr,
+            stringr,
+            janitor,
+            purrr,
+            lubridate,
+            gt,
+            gtExtras
+            extra-packages: |
+            andreweatherman/gtUtils      
       - name: Run R script
         run: Rscript scripts/dre_top5.R
 
@@ -50,7 +38,5 @@ EOF
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add png/*.png
-          git commit -m "Auto update" || echo "No changes"
+          git commit -m "Auto update" || true
           git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

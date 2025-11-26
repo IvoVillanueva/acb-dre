@@ -41,7 +41,7 @@ df <- jornada_dre %>%
     fecha = format(fecha, "%d/%m/%Y"),
     x2pm_a = paste0(x2pt_success, "/", x2pt_tried),
     x3pm_a = paste0(x3pt_success, "/", x3pt_tried),
-    x1pm_a = paste0(x3pt_success, "/", x1pt_tried),
+    x1pm_a = paste0(x1pt_success, "/", x1pt_tried),
     equipo = ifelse(
       abb == local_team_team_abbrev_name,
       local_team_team_actual_name,

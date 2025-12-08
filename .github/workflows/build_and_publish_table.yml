@@ -64,4 +64,4 @@ jobs:
         run: |
           # El comando 'quarto publish' detectará automáticamente el token en la variable
           # de entorno QUARTO_PUB_TOKEN y lo usará.
-          quarto publish quarto-pub acb-dre.html --no-prompt
+          quarto publish quarto-pub acb-dre.qmd --no-prompt

@@ -1,14 +1,17 @@
 on:
   workflow_dispatch:
-  # opcional: descomenta para programar publicaciones automáticas
-  # schedule:
-  #   - cron: "0 5 * * 1"
+  schedule:
+    - cron: "0 5 * * 1"
 
 jobs:
-  publish:
+  build-and-publish:
     runs-on: ubuntu-latest
+
     env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      # Definir explícitamente R_LIBS_USER para cache y para la instalación
+      R_LIBS_USER: /home/runner/work/_temp/Library
 
     steps:
       - name: Checkout repo
@@ -20,13 +23,18 @@ jobs:
           r-version: "release"
           use-public-rspm: true
 
-      - name: Install Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          # hash del script y del QMD correcto (corrige tabla_dre.qmd -> acb-dre.qmd)
+          key: ${{ runner.os }}-r-v2-${{ hashFiles('scripts/*.R') }}-${{ hashFiles('acb-dre.qmd') }}
+          restore-keys: |
+            ${{ runner.os }}-r-v2-
 
-      - name: Install R packages required for render
+      - name: Install CRAN packages
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          # lista mínima; añade otros paquetes que use tu scripts/acb_dre_table.R
           packages: |
             rmarkdown
             knitr
@@ -38,24 +46,44 @@ jobs:
             glue
             lubridate
 
-      - name: Render QMD -> HTML
+      - name: Install Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Check files and _publish.yml
         run: |
-          # Fail early if the QMD is not in the repo root
-          if [ ! -f acb-dre.qmd ]; then
-            echo "ERROR: acb-dre.qmd not found in repo root. Adjust path or move file."
+          echo "PWD: $(pwd)"
+          echo "List root files:"
+          ls -la
+          echo "Show _publish.yml if present:"
+          if [ -f _publish.yml ]; then
+            sed -n '1,200p' _publish.yml
+          else
+            echo "_publish.yml NOT found in repo root"
+          fi
+          echo "Check QMD exists:"
+          if [ -f acb-dre.qmd ]; then
+            echo "acb-dre.qmd FOUND"
+          else
+            echo "ERROR: acb-dre.qmd NOT found in repo root; aborting"
             exit 1
           fi
+
+      - name: Render QMD
+        run: |
+          # usar R_LIBS_USER ya definido en env
+          echo "R_LIBS_USER = $R_LIBS_USER"
           quarto render acb-dre.qmd
+          echo "Rendered files:"
           ls -la acb-dre.* || true
 
-      - name: Publish to Quarto Public (publish the generated HTML)
+      - name: Publish to Quarto Pub (non-interactive, debug)
         env:
           QUARTO_PUB_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}
         run: |
-          # Publicar el HTML resultante sin interacción
-          if [ -f acb-dre.html ]; then
-            quarto publish quarto-pub acb-dre.html --no-prompt
-          else
-            echo "ERROR: acb-dre.html not found; aborting publish"
-            exit 1
-          fi
+          mkdir -p debug_out
+          # publicar el .qmd usando el target definido en _publish.yml
+          quarto publish quarto-pub acb-dre.qmd --no-prompt --debug > debug_out/publish.log 2>&1 || true
+          echo "EXIT CODE: $?"
+          echo "---- Last 200 lines of publish.log ----"
+          tail -n 200 debug_out/publish.log || true
+          echo "----------------------------------------"

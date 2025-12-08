@@ -8,6 +8,18 @@ format:
   html:
     theme: cosmo
 ---
+```{r debug, echo=TRUE}
+# Debug inicial: comprobar rutas y que el script exista
+cat("PWD:", getwd(), "\n")
+cat("List scripts/:", paste(list.files("scripts"), collapse = ", "), "\n")
+if (!file.exists("scripts/acb_dre_table.R")) {
+  stop("ERROR: scripts/acb_dre_table.R no existe en la ruta esperada (repo root).")
+}
+# Sourceear para cargar df y funciones necesarias
+source("scripts/acb_dre_table.R")
+cat("Sourcing OK. Objetos cargados (primeros 50):\n")
+print(ls()[1:50])
+```
 
 ```{r}
 knitr::opts_chunk$set(echo = FALSE)

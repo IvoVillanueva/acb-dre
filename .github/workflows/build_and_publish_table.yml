@@ -1,3 +1,5 @@
+name: Build and Publish ACB DRE Table
+
 on:
   workflow_dispatch:
   schedule:
@@ -6,7 +8,9 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+
     env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
     steps:
@@ -17,9 +21,19 @@ jobs:
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: "release"
+          # La clave de la velocidad: usar binarios precompilados.
           use-public-rspm: true
 
-      - name: (Opcional) Install R deps
+      # --- CACHÉ OPTIMIZADO ---
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-v2-${{ hashFiles('scripts/*.R') }}-${{ hashFiles('tabla_dre.qmd') }}
+          restore-keys: |
+            ${{ runner.os }}-r-v2-
+
+      - name: Install CRAN packages
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages: |
@@ -31,23 +45,23 @@ jobs:
             lubridate
             rmarkdown
             knitr
+          shell: Rscript {0}
 
       - name: Install Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Debug: show files & Quarto version
+      - name: Render QMD
         run: |
-          quarto --version
-          echo "PWD: $(pwd)"
-          ls -la
-
-      - name: Render QMD (opcional, puedes omitir si quieres publicar con render en publish)
-        run: |
+          export R_LIBS_USER=${{ env.R_LIBS_USER }}
           quarto render acb-dre.qmd
 
-      - name: Publish to Quarto Public (render during publish)
+      # --- SOLUCIÓN FINAL A "_publish.yml" ---
+      # Ejecutamos el comando de publicación, pasando el token explícitamente como env
+      # para evitar que Quarto busque archivos de configuración.
+      - name: Publish to Quarto Pub (CLI Directo)
         env:
           QUARTO_PUB_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}
         run: |
-          # Publica y deja que Quarto renderice si es necesario (quita --no-render)
+          # El comando 'quarto publish' detectará automáticamente el token en la variable
+          # de entorno QUARTO_PUB_TOKEN y lo usará.
           quarto publish quarto-pub acb-dre.qmd --no-prompt

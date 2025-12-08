@@ -76,14 +76,27 @@ jobs:
           echo "Rendered files:"
           ls -la acb-dre.* || true
 
-      - name: Publish to Quarto Pub (non-interactive, capture log)
-        env:
-          QUARTO_PUB_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}
-        run: |
-          mkdir -p debug_out
-          # publicar el .qmd usando el target definido en _publish.yml (sin --debug)
-          quarto publish quarto-pub acb-dre.qmd --no-prompt > debug_out/publish.log 2>&1 || true
-          echo "EXIT CODE: $?"
-          echo "---- Last 200 lines of publish.log ----"
-          tail -n 200 debug_out/publish.log || true
-          echo "----------------------------------------"
+      - name: Quarto info (version & help)
+  run: |
+    echo "Quarto version:"
+    quarto --version || true
+    echo
+    echo "Quarto publish help (first 200 lines):"
+    quarto publish --help | sed -n '1,200p' || true
+
+- name: Quarto info (version & help)
+  run: |
+    echo "Quarto version:"
+    quarto --version || true
+    echo
+    echo "Quarto publish help (first 200 lines):"
+    quarto publish --help | sed -n '1,200p' || true
+
+- name: Publish to Quarto Pub (run live, show output)
+  env:
+    QUARTO_PUB_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}
+  run: |
+    echo "Running: quarto publish quarto-pub acb-dre.qmd --no-prompt"
+    quarto publish quarto-pub acb-dre.qmd --no-prompt
+    rc=$?
+    echo "EXIT CODE: $rc"

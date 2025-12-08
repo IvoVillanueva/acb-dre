@@ -1,0 +1,61 @@
+on:
+  workflow_dispatch:
+  # opcional: descomenta para programar publicaciones automáticas
+  # schedule:
+  #   - cron: "0 5 * * 1"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
+          use-public-rspm: true
+
+      - name: Install Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Install R packages required for render
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          # lista mínima; añade otros paquetes que use tu scripts/acb_dre_table.R
+          packages: |
+            rmarkdown
+            knitr
+            reactable
+            htmltools
+            htmlwidgets
+            tidyverse
+            janitor
+            glue
+            lubridate
+
+      - name: Render QMD -> HTML
+        run: |
+          # Fail early if the QMD is not in the repo root
+          if [ ! -f acb-dre.qmd ]; then
+            echo "ERROR: acb-dre.qmd not found in repo root. Adjust path or move file."
+            exit 1
+          fi
+          quarto render acb-dre.qmd
+          ls -la acb-dre.* || true
+
+      - name: Publish to Quarto Public (publish the generated HTML)
+        env:
+          QUARTO_PUB_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}
+        run: |
+          # Publicar el HTML resultante sin interacción
+          if [ -f acb-dre.html ]; then
+            quarto publish quarto-pub acb-dre.html --no-prompt
+          else
+            echo "ERROR: acb-dre.html not found; aborting publish"
+            exit 1
+          fi

@@ -1,0 +1,99 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  debug-publish-verbose:
+    runs-on: ubuntu-latest
+    env:
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Show repo files & publish config
+        run: |
+          echo "PWD: $(pwd)"
+          echo "Top-level files:"
+          ls -la
+          echo
+          echo "Show _publish.yml if present:"
+          if [ -f _publish.yml ]; then
+            sed -n '1,200p' _publish.yml || true
+          else
+            echo "_publish.yml NOT found at repo root"
+          fi
+          echo
+          echo "Find acb-dre.qmd:"
+          git ls-files | grep -n "acb-dre.qmd" || true
+          echo "List qmd files:"
+          git ls-files '*.qmd' | sed -n '1,200p' || true
+
+      - name: Setup R & Quarto
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
+          use-public-rspm: true
+
+      - name: Install Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Quarto version
+        run: |
+          quarto --version || true
+
+      - name: Render to HTML (explicit)
+        run: |
+          set -x
+          if [ -f acb-dre.qmd ]; then
+            quarto render acb-dre.qmd || true
+          else
+            echo "acb-dre.qmd NOT found in repo root; adjust path if necessary"
+          fi
+          echo "Rendered files:"
+          ls -la || true
+
+      - name: Publish attempts (capture outputs)
+        env:
+          QUARTO_PUB_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}
+        run: |
+          set -x
+          mkdir -p debug_out
+
+          echo "Attempt 1: publish using named target 'quarto-pub' with .qmd"
+          quarto publish quarto-pub acb-dre.qmd --no-prompt > debug_out/qp_qmd.log 2>&1 || true
+          echo "EXIT_CODE qp_qmd: $?"
+          echo "---- last 200 lines qp_qmd.log ----"
+          tail -n 200 debug_out/qp_qmd.log || true
+          echo "------------------------------------"
+
+          echo "Attempt 2: publish using named target 'quarto-pub' with .html (if exists)"
+          if [ -f acb-dre.html ]; then
+            quarto publish quarto-pub acb-dre.html --no-prompt > debug_out/qp_html.log 2>&1 || true
+            echo "EXIT_CODE qp_html: $?"
+            echo "---- last 200 lines qp_html.log ----"
+            tail -n 200 debug_out/qp_html.log || true
+            echo "-------------------------------------"
+          else
+            echo "acb-dre.html not found; skipping qp_html attempt"
+          fi
+
+          echo "Attempt 3: publish using builtin 'quarto.pub' with .qmd"
+          quarto publish quarto.pub acb-dre.qmd --no-prompt > debug_out/qpub_qmd.log 2>&1 || true
+          echo "EXIT_CODE qpub_qmd: $?"
+          echo "---- last 200 lines qpub_qmd.log ----"
+          tail -n 200 debug_out/qpub_qmd.log || true
+          echo "-------------------------------------"
+
+          echo "Attempt 4: publish using builtin 'quarto.pub' with .html (if exists)"
+          if [ -f acb-dre.html ]; then
+            quarto publish quarto.pub acb-dre.html --no-prompt > debug_out/qpub_html.log 2>&1 || true
+            echo "EXIT_CODE qpub_html: $?"
+            echo "---- last 200 lines qpub_html.log ----"
+            tail -n 200 debug_out/qpub_html.log || true
+            echo "--------------------------------------"
+          else
+            echo "acb-dre.html not found; skipping qpub_html attempt"
+          fi
+
+          echo "Saved publish logs to debug_out/*.log"

@@ -1,0 +1,114 @@
+name: Publish Quarto Document to Quarto Pub (Debug)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"  # Every Monday at 5:00 AM UTC
+
+jobs:
+  publish-quarto:
+    name: Render and Publish Quarto Document
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Show root files and _publish.yml content
+        run: |
+          echo "=== Files in root directory ==="
+          ls -la
+          echo ""
+          echo "=== Content of _publish.yml ==="
+          if [ -f "_publish.yml" ]; then
+            cat _publish.yml
+          else
+            echo "_publish.yml not found!"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+          r-version: 'release'
+
+      - name: Setup Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Verify acb-dre.qmd exists
+        run: |
+          if [ ! -f "acb-dre.qmd" ]; then
+            echo "ERROR: acb-dre.qmd not found in root directory!"
+            echo "Please ensure the file is in the repository root."
+            exit 1
+          fi
+          echo "✓ acb-dre.qmd found in root directory"
+        shell: bash
+
+      - name: Render Quarto document
+        run: |
+          echo "Rendering acb-dre.qmd..."
+          quarto render acb-dre.qmd
+          echo "✓ Rendering completed"
+        shell: bash
+
+      - name: Create debug output directory
+        run: mkdir -p debug_out
+        shell: bash
+
+      - name: Publish QMD to Quarto Pub
+        env:
+          QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}
+        run: |
+          echo "Publishing acb-dre.qmd to quarto-pub target..."
+          quarto publish quarto-pub acb-dre.qmd --no-prompt \
+            --debug > debug_out/publish_quarto-pub_qmd.log 2>&1 || true
+          echo "✓ Publish command completed (check logs for status)"
+        shell: bash
+
+      - name: Publish HTML to Quarto Pub (if exists)
+        env:
+          QUARTO_PUB_AUTH_TOKEN: ${{ secrets.QUARTO_PUB_TOKEN }}
+        run: |
+          if [ -f "acb-dre.html" ]; then
+            echo "Publishing acb-dre.html to quarto-pub target..."
+            quarto publish quarto-pub acb-dre.html --no-prompt \
+              --debug > debug_out/publish_quarto-pub_html.log 2>&1 || true
+            echo "✓ HTML publish command completed (check logs for status)"
+          else
+            echo "acb-dre.html not found, skipping HTML publish"
+          fi
+        shell: bash
+
+      - name: Display publish logs
+        run: |
+          echo "======================================"
+          echo "=== QMD Publish Log (last 50 lines) ==="
+          echo "======================================"
+          if [ -f "debug_out/publish_quarto-pub_qmd.log" ]; then
+            tail -n 50 debug_out/publish_quarto-pub_qmd.log
+          else
+            echo "Log file not found!"
+          fi
+          echo ""
+          echo "======================================"
+          echo "=== HTML Publish Log (last 50 lines) ==="
+          echo "======================================"
+          if [ -f "debug_out/publish_quarto-pub_html.log" ]; then
+            tail -n 50 debug_out/publish_quarto-pub_html.log
+          else
+            echo "HTML log file not found (may not have been created)"
+          fi
+        shell: bash
+
+      - name: Upload debug logs as artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: publish-debug-logs
+          path: debug_out/*.log
+          retention-days: 30

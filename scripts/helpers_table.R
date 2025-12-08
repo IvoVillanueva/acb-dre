@@ -80,7 +80,7 @@ logo_header <- htmltools::HTML(paste0(
 
     <!-- TITULO -->
     <div style='font-size:28px; font-weight:600; line-height:1.1; margin-bottom:4px;'>
-      Los Mejores De La Jornada ",jor_max, "
+      Los Mejores de La Jornada ",jor_max, "
     </div>
 
     <!-- SUBTITULO -->

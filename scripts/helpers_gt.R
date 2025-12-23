@@ -56,13 +56,14 @@ totales_equipo <- jornada_dre %>%
   )
 
 # Credits + social caption (HTML formatted for GT footer)
-ctwitter <- "<span style='color:#c8102e;font-family: \"Font Awesome 6 Brands\"'>&#xE61A;</span>"
+twitter <- "<span style='color:#b14f04'>&#x1D54F;</span>"
 tweetelcheff <- "<span style='font-weight:bold;color: grey;'>*@elcheff*</span>"
 insta <- "<span style='color:#E1306C;font-family: \"Font Awesome 6 Brands\"'>&#xE055;</span>"
 instaelcheff <- "<span style='font-weight:bold;color: grey;'>*@sport_iv0*</span>"
 github <- "<span style='color:#c8102e;font-family: \"Font Awesome 6 Brands\"'>&#xF092;</span>"
 githubelcheff <- "<span style='font-weight:bold;color: grey;'>*IvoVillanueva*</span>"
 caption <- glue::glue("**Datos**: *@NBA* | **Gráfico**: *Ivo Villanueva* • {twitter} {tweetelcheff} • {insta} {instaelcheff} • {github} {githubelcheff}")
+
 
 # Extract last jornada number (used in GT title)
 jor_max <- max(jornada_dre$num_jornada)

@@ -58,9 +58,10 @@ df %>%
   gt_theme_savant() %>%
   tab_options(
     heading.align = "left",
-    table.font.names = "Oswald",
+    #table.font.names = "Oswald",
     table.additional_css = ".gt_table {
                 margin-bottom: 40px;
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
   @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css');
               }"
   ) %>%

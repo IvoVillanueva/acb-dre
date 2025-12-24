@@ -58,7 +58,6 @@ df %>%
   gt_theme_savant() %>%
   tab_options(
     heading.align = "left",
-    #table.font.names = "Oswald",
     table.additional_css = ".gt_table {
                 margin-bottom: 40px;
   @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
@@ -75,6 +74,18 @@ df %>%
                       font = "Oswald"),
     locations = cells_stub()
   ) %>% 
+tab_style(
+  style = cell_text(font = "Oswald"),
+  locations = cells_title(groups = "title")
+) %>%
+tab_style(
+  style = cell_text(font = "Oswald"),
+  locations = cells_column_labels()
+) %>%
+tab_style(
+  style = cell_text(font = "Oswald"),
+  locations = cells_body()
+) %>%
   tab_header(
     title = paste0("Los 5 Mejores y Los 3 Peores De La J",jor_max) ,
     subtitle = md("Ordenados por el **Daily RAPM**")

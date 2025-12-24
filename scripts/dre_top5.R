@@ -65,7 +65,8 @@ df %>%
               }"
   ) %>%
   tab_style(
-    style = cell_text(size = px(10)),
+    style = cell_text(size = px(10),
+                      font = "Oswald"),
     locations = cells_source_notes()
   ) |>
   tab_style(

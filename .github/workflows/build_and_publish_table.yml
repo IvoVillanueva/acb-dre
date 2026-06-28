@@ -2,8 +2,8 @@ name: Build and Publish ACB DRE Table
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 5 * * 1"
+  #schedule:
+    #- cron: "0 5 * * 1"
 
 jobs:
   build-and-publish:
